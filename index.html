@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anorectal Disorders Assistant</title>
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--tx:#1b2430;--mut:#5d6b7a;--pri:#0b6e8a;--pri2:#e3f2f7;--bd:#dce3ea;--red:#b3261e;--redbg:#fdecea;--grn:#1b7a43;--grnbg:#e8f5ec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161c;--card:#18212a;--tx:#e6ecf1;--mut:#9aa9b7;--pri:#5cc0dc;--pri2:#173843;--bd:#2a3743;--red:#ff8a80;--redbg:#3a1d1b;--grn:#7ad69c;--grnbg:#173424;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10161c;--card:#18212a;--tx:#e6ecf1;--mut:#9aa9b7;--pri:#5cc0dc;--pri2:#173843;--bd:#2a3743;--red:#ff8a80;--redbg:#3a1d1b;--grn:#7ad69c;--grnbg:#173424;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:14px 16px;background:var(--pri);color:#fff}
+header h1{margin:0;font-size:18px}header p{margin:2px 0 0;font-size:12px;opacity:.9}
+nav{display:flex;gap:6px;padding:8px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0}
+nav button{flex:0 0 auto;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:7px 12px;border-radius:18px;font-size:14px}
+nav button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+main{max-width:760px;margin:0 auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+h2{font-size:16px;margin:0 0 8px;color:var(--pri)}h3{font-size:14px;margin:10px 0 4px}
+label{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:14px}
+input[type=checkbox]{margin-top:4px;width:18px;height:18px}
+.btn{background:var(--pri);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:15px;margin-top:8px}
+.btn.s{background:var(--pri2);color:var(--pri)}
+.bar{height:8px;background:var(--pri2);border-radius:4px;overflow:hidden;margin:3px 0 8px}.bar i{display:block;height:100%;background:var(--pri)}
+.warn{background:var(--redbg);color:var(--red);border-radius:8px;padding:8px 10px;margin:8px 0;font-size:14px}
+.ok{background:var(--grnbg);color:var(--grn);border-radius:8px;padding:8px 10px;margin:8px 0;font-size:14px}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid var(--bd);padding:6px 8px;text-align:left;vertical-align:top}th{background:var(--pri2)}
+select,input[type=search]{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);font-size:15px;margin-bottom:8px}
+.sm{font-size:12px;color:var(--mut)}ul{padding-left:20px;margin:4px 0}
+</style></head><body>
+<header><h1>Anorectal Disorders Assistant</h1><p>Hemorrhoids · Abscess · Fistula in ano · Anal fissure — based on Harrison’s Ch. 328</p></header>
+<nav id="nav"></nav><main id="m"></main>
+<script>
+var tabs=["Assess","Hemorrhoids Rx","Medicines","Learn"],cur=0;
+var Q=[
+["bleed","Painless bright red blood on wiping or in the toilet"],
+["prolapse","Protruding mass or tissue at the anus"],
+["thromb","Sudden, severe pain with a tender perianal lump (possible thrombosed hemorrhoid)"],
+["sharp","Sharp pain during defecation, lasting after, relentless"],
+["constip","Constipation, straining or hard stools"],
+["swell","Painful perianal swelling with fever"],
+["dysuria","Difficulty voiding or dysuria with perianal pain"],
+["drain","Constant or recurrent perianal drainage after a prior abscess"],
+["mass","Firm perianal mass or opening with discharge and soiling"],
+["soil","Wet anus or mucus soiling, inability to keep hygiene"]];
+var R=[
+["anemia","Significant bleeding or anemia"],
+["age","Age over 45, or no previous colorectal screening"],
+["fam","Family history of colorectal cancer"],
+["imm","Diabetes, immunocompromised, HIV, hematologic disorder or IBD"],
+["recur","Recurrent abscess or fistula (consider Crohn’s, TB)"],
+["lat","Fissure in a lateral position (not posterior or anterior midline)"]];
+var D={
+hem:{n:"Hemorrhoidal disease",w:{bleed:3,prolapse:3,thromb:3,soil:1,constip:1}},
+abs:{n:"Anorectal abscess",w:{swell:5,dysuria:2,imm:1}},
+fis:{n:"Anal fissure",w:{sharp:5,constip:2,bleed:1}},
+fst:{n:"Fistula in ano",w:{drain:4,mass:3,recur:2,soil:1}}};
+function chk(id,t){return '<label><input type=checkbox id="'+id+'"> '+t+'</label>'}
+function assess(){
+return '<div class=card><h2>Presenting features</h2>'+Q.map(function(q){return chk(q[0],q[1])}).join('')+'</div><div class=card><h2>Risk factors and red flags</h2>'+R.map(function(q){return chk(q[0],q[1])}).join('')+'<button class=btn onclick="run()">Suggest diagnosis</button></div><div id=out></div>'}
+function on(k){var e=document.getElementById(k);return e&&e.checked}
+function run(){
+var res=[],max=0;
+for(var k in D){var s=0,tot=0;for(var f in D[k].w){tot+=D[k].w[f];if(on(f))s+=D[k].w[f]}res.push([k,s,tot])}
+res.sort(function(a,b){return b[1]/b[2]-a[1]/a[2]});
+var h='<div class=card><h2>Likely diagnoses</h2>';
+var any=res[0][1]>0;
+if(!any)h+='<p>Select at least one feature.</p>';
+res.forEach(function(r){if(r[1]>0)h+='<b>'+D[r[0]].n+'</b> <span class=sm>('+Math.round(100*r[1]/r[2])+'% feature match)</span><div class=bar><i style="width:'+Math.round(100*r[1]/r[2])+'%"></i></div>'});
+var w=[];
+if(on("anemia")||on("age")||on("fam"))w.push("Rule out colonic neoplasm before attributing bleeding to hemorrhoids: colonoscopy or flexible sigmoidoscopy (colonoscopy first in young patients with a family history). Anemia with bleeding needs a colonic work-up.");
+if(on("mass")&&on("soil"))w.push("A protruding mass with hygiene problems: exclude malignancy.");
+if(on("lat"))w.push("A fissure outside the posterior or anterior midline raises suspicion of TB, syphilis, Crohn’s disease or malignancy; systemic causes should be ruled out.");
+if(on("imm")&&on("swell"))w.push("Immunocompromised or diabetic with an abscess: drain in the operating room under anesthesia (higher risk of necrotizing fasciitis); antibiotics are indicated.");
+if(on("recur"))w.push("Recurrent perianal sepsis: consider IBD (colonoscopy and small-bowel series).");
+w.forEach(function(x){h+='<div class=warn>⚠ '+x+'</div>'});
+var top=res[0][0];
+if(any)h+='<h3>Next steps</h3>'+NEXT[top];
+h+='<p class=sm>Decision support only; it does not replace clinical examination.</p></div>';
+document.getElementById("out").innerHTML=h;document.getElementById("out").scrollIntoView({behavior:"smooth"})}
+var NEXT={
+hem:'<ul><li>Inspect the perianal area for thrombosis or excoriation, then a careful digital examination.</li><li>Anoscopy with the patient straining; differentiate from full-thickness rectal prolapse (concentric rings vs radial folds).</li><li>Stage and locate the hemorrhoidal complexes. Open the <b>Hemorrhoids Rx</b> tab.</li></ul>',
+abs:'<ul><li>Examine for a large fluctuant area; prostatic abscess may present with dysuria.</li><li>Labs: WBC. Imaging (CT/MRI) only for recurrent abscess or to assess incomplete drainage.</li><li>Treatment: drainage is the gold standard. See <b>Learn</b>.</li></ul>',
+fis:'<ul><li>The history is usually enough; most fissures are posterior midline.</li><li>Avoid forceful examination; consider anal manometry if needed.</li><li>Initial care is conservative. See <b>Medicines</b>.</li></ul>',
+fst:'<ul><li>Examination under anesthesia with anoscopy to find the internal opening; diluted hydrogen peroxide can help.</li><li>MRI with endoanal coil identifies tracts in about 80%.</li><li>Goodsall’s rule: a posterior external opening enters the posterior midline; an anterior one enters the nearest crypt. Opening more than 3 cm from the verge may be complex.</li></ul>'};
+var GR=[
+["Grade I","Bleeds, no prolapse","Fiber 25–30 g/day, fluids, stool softeners; topical agents; flavonoids; sitz baths. Banding, infrared coagulation or sclerotherapy if bleeding continues."],
+["Grade II","Prolapse that reduces spontaneously","As above, plus office procedures: rubber band ligation, infrared coagulation, sclerotherapy."],
+["Grade III","Prolapse needing manual reduction","Rubber band ligation is first-line office option; excisional hemorrhoidectomy, THD or stapled hemorrhoidopexy (PPH) if symptomatic or failed."],
+["Grade IV","Irreducible prolapse, often with thrombosis","Surgery: hemorrhoidectomy (excisional, ligator-assisted, THD) or stapled; emergent surgery carries more complications."],
+["Acute thrombosed","Severe pain, tender blue lump","Elliptical excision within the first 72 h; sitz baths, fiber, stool softeners, analgesics."]];
+function hx(){
+return '<div class=card><h2>Treatment by stage</h2><div class=tw><table><tr><th>Stage</th><th>Features</th><th>Management</th></tr>'+GR.map(function(g){return '<tr><td><b>'+g[0]+'</b></td><td>'+g[1]+'</td><td>'+g[2]+'</td></tr>'}).join('')+'</table></div><p class=sm>Staging grades follow the usual Goligher scheme; the textbook refers to the stage of disease (Table 328-6).</p></div>'+
+'<div class=card><h2>Office procedures: key points</h2><ul><li>Sensation begins at the dentate line, so procedures above it are painless. Bands go around engorged tissue (ischemia and fibrosis); expect a dull ache for about 24 h.</li><li>Sclerotherapy: 1–2 mL of sclerosant (usually sodium tetradecyl sulfate) via 25-gauge needle into the submucosa. Do not inject the anal canal circumferentially (stenosis).</li><li>Surgical methods are equally effective for grades III–IV. Excisional: removes skin tags, more pain. Stapled: less discomfort, tags remain, more complications. THD: ultrasound-guided ligation.</li><li><b>Avoid</b> procedures if immunocompromised or with active proctitis.</li><li>Complications: pain, infection, recurrent bleeding, urinary retention, overhydration, fecal incontinence, anal stenosis, ectropion.</li></ul></div>'}
+var M=[
+["Hemorrhoids","Bulk fiber","Isabgol (psyllium): Sat-Isabgol, Naturolax, Fybogel","1 tbsp in water once or twice daily"],
+["Hemorrhoids","Stool softener / laxative","Cremaffin (liquid paraffin + milk of magnesia), Duphalac (lactulose), Looz","Bedtime; titrate to soft stool"],
+["Hemorrhoids","Venotonic flavonoid","Daflon 500 / Detralex (micronized diosmin + hesperidin)","Short course, higher dose first days, then 500 mg-1 g/day; check label"],
+["Hemorrhoids","Venotonic","Doxium (calcium dobesilate)","Per label"],
+["Hemorrhoids","Topical anesthetic + steroid","Proctosedyl (hydrocortisone + cinchocaine), Xyloproct (lidocaine + hydrocortisone + zinc)","Short course (about 1 week) to limit mucosal atrophy"],
+["Hemorrhoids","Oral combination (herbal)","Pilex tablets and ointment (Himalaya)","Adjunct, per label"],
+["Hemorrhoids","Analgesic","Paracetamol (Calpol, Crocin); NSAID (Naproxen, Ibuprofen) if appropriate","Avoid codeine-type drugs (constipating)"],
+["Fissure","Topical calcium-channel blocker","Nifedipine ointment (compounded; some brands combine nifedipine + lidocaine); diltiazem 2% gel","Three times a day; healing over 60–90%"],
+["Fissure","Topical nitrate","Anobliss (glyceryl trinitrate 0.2%), Rectogesic","Twice daily; headache is common"],
+["Fissure","Botulinum toxin A","Botox, Nabota","Up to 20 units, injected into internal sphincter each side"],
+["Fissure","Topical anesthetic","Lignocaine jelly/ointment (Xylocaine, Lox)","Before defecation"],
+["Fistula / post-op","Antiseptic and analgesia","Sitz bath (warm water, or povidone-iodine: Betadine); metronidazole (Flagyl) if prescribed","After each bowel motion"],
+["Abscess","Antibiotics (only if high risk)","Amoxicillin-clavulanate (Augmentin, Clavam) or ciprofloxacin + metronidazole","Immunocompromised, prosthetic valve or joint, diabetes, IBD; drainage is the main treatment"]];
+var mq="";
+function med(){
+var s='<div class=card><h2>Medicines and brand names</h2><input type=search id=q placeholder="Search drug, brand or condition…" oninput="mf(this.value)"><div class=tw id=tb></div><p class=sm>Brands are examples commonly marketed in India; availability and compositions vary, so verify against current labels, contraindications and local formulary before prescribing. Doses are indicative only.</p></div>';
+return s}
+function mf(v){v=(v||"").toLowerCase();var r=M.filter(function(x){return x.join(" ").toLowerCase().indexOf(v)>-1});
+document.getElementById("tb").innerHTML='<table><tr><th>For</th><th>Class</th><th>Brands</th><th>Notes</th></tr>'+r.map(function(x){return '<tr><td>'+x.join('</td><td>')+'</td></tr>'}).join('')+'</table>'}
+function learn(){
+function c(t,b){return '<div class=card><h2>'+t+'</h2>'+b+'</div>'}
+return c("Hemorrhoids",'<ul><li>Present with bleeding and protrusion; pain is less common than with fissure. Severe pain suggests thrombosis.</li><li>Bleeding: painless bright red blood in the toilet or on wiping.</li><li>Diagnosis is by physical examination, digital examination and anoscopy.</li></ul>')+
+c("Anorectal abscess",'<ul><li>Men:women 3:1; peak in third to fifth decades. More common with diabetes, hematologic disorders, IBD, HIV.</li><li>Cryptoglandular infection: perianal 40–50%, ischiorectal 20–25%, intersphincteric 2–5%, supralevator 2.5%.</li><li>Perianal pain and fever are hallmarks. Treatment: drainage (Mallekot drain for larger cavities); OR drainage for complicated or high-risk patients.</li></ul>')+
+c("Fistula in ano",'<ul><li>Communication between an abscess cavity and an internal opening, usually at the dentate line. 30–40% of abscesses lead to fistula.</li><li>Types: intersphincteric 70%, transsphincteric 23%, suprasphincteric 5%, extrasphincteric 2%.</li><li>Treatment: seton placement; fistulotomy for intersphincteric and low transsphincteric (less than one-third of muscle); advancement flap, fibrin glue, LIFT for higher tracts. Recurrence 0–18% after fistulotomy; incontinence rare (&lt;10%).</li><li>Crohn’s fistulas: mesenchymal stem cell therapy (ADMIRE) improved remission at 52 weeks (59% vs 42%).</li></ul>')+
+c("Anal fissure",'<ul><li>Most common cause of rectal bleeding in infancy. Mostly posterior (or anterior) midline; related to constipation, diarrhea, trauma, Crohn’s.</li><li>Raised internal sphincter pressure causes relative ischemia and poor healing.</li><li>Chronic: present over 6 weeks; sentinel pile, hypertrophied papilla, visible sphincter fibers.</li><li>Conservative care heals 60–90%: fiber, softeners, topical anesthetics, sitz baths. Nifedipine ointment TDS or botulinum toxin heals over 80%. Surgery: lateral internal sphincterotomy (incontinence risk, more in women).</li></ul>')}
+function show(){
+var h=document.getElementById("nav");h.innerHTML=tabs.map(function(t,i){return '<button class="'+(i==cur?'on':'')+'" onclick="cur='+i+';show()">'+t+'</button>'}).join('');
+document.getElementById("m").innerHTML=[assess,hx,med,learn][cur]();if(cur==2)mf("");window.scrollTo(0,0)}
+show();
+</script></body></html>
