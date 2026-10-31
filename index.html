@@ -14,7 +14,7 @@ header h1{margin:0;font-size:18px}header p{margin:2px 0 0;font-size:12px;opacity
 nav{display:flex;gap:6px;padding:8px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0}
 nav button{flex:0 0 auto;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:7px 12px;border-radius:18px;font-size:14px}
 nav button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
-main{max-width:760px;margin:0 auto;padding:12px}
+main{max-width:1100px;margin:0 auto;padding:12px}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px}
 h2{font-size:16px;margin:0 0 8px;color:var(--pri)}h3{font-size:14px;margin:10px 0 4px}
 label{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:14px}
@@ -26,7 +26,7 @@ input[type=checkbox]{margin-top:4px;width:18px;height:18px}
 .ok{background:var(--grnbg);color:var(--grn);border-radius:8px;padding:8px 10px;margin:8px 0;font-size:14px}
 .tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid var(--bd);padding:6px 8px;text-align:left;vertical-align:top}th{background:var(--pri2)}
 select,input[type=search]{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);font-size:15px;margin-bottom:8px}
-.sm{font-size:12px;color:var(--mut)}ul{padding-left:20px;margin:4px 0}
+a{color:var(--pri)}.tw table{min-width:760px}.sm{font-size:12px;color:var(--mut)}ul{padding-left:20px;margin:4px 0}
 </style></head><body>
 <header><h1>Anorectal Disorders Assistant</h1><p>Hemorrhoids · Abscess · Fistula in ano · Anal fissure — based on Harrison’s Ch. 328</p></header>
 <nav id="nav"></nav><main id="m"></main>
@@ -92,26 +92,954 @@ var GR=[
 function hx(){
 return '<div class=card><h2>Treatment by stage</h2><div class=tw><table><tr><th>Stage</th><th>Features</th><th>Management</th></tr>'+GR.map(function(g){return '<tr><td><b>'+g[0]+'</b></td><td>'+g[1]+'</td><td>'+g[2]+'</td></tr>'}).join('')+'</table></div><p class=sm>Staging grades follow the usual Goligher scheme; the textbook refers to the stage of disease (Table 328-6).</p></div>'+
 '<div class=card><h2>Office procedures: key points</h2><ul><li>Sensation begins at the dentate line, so procedures above it are painless. Bands go around engorged tissue (ischemia and fibrosis); expect a dull ache for about 24 h.</li><li>Sclerotherapy: 1–2 mL of sclerosant (usually sodium tetradecyl sulfate) via 25-gauge needle into the submucosa. Do not inject the anal canal circumferentially (stenosis).</li><li>Surgical methods are equally effective for grades III–IV. Excisional: removes skin tags, more pain. Stapled: less discomfort, tags remain, more complications. THD: ultrasound-guided ligation.</li><li><b>Avoid</b> procedures if immunocompromised or with active proctitis.</li><li>Complications: pain, infection, recurrent bleeding, urinary retention, overhydration, fecal incontinence, anal stenosis, ectropion.</li></ul></div>'}
-var M=[
-["Hemorrhoids","Bulk fiber","Isabgol (psyllium): Sat-Isabgol, Naturolax, Fybogel","1 tbsp in water once or twice daily"],
-["Hemorrhoids","Stool softener / laxative","Cremaffin (liquid paraffin + milk of magnesia), Duphalac (lactulose), Looz","Bedtime; titrate to soft stool"],
-["Hemorrhoids","Venotonic flavonoid","Daflon 500 / Detralex (micronized diosmin + hesperidin)","Short course, higher dose first days, then 500 mg-1 g/day; check label"],
-["Hemorrhoids","Venotonic","Doxium (calcium dobesilate)","Per label"],
-["Hemorrhoids","Topical anesthetic + steroid","Proctosedyl (hydrocortisone + cinchocaine), Xyloproct (lidocaine + hydrocortisone + zinc)","Short course (about 1 week) to limit mucosal atrophy"],
-["Hemorrhoids","Oral combination (herbal)","Pilex tablets and ointment (Himalaya)","Adjunct, per label"],
-["Hemorrhoids","Analgesic","Paracetamol (Calpol, Crocin); NSAID (Naproxen, Ibuprofen) if appropriate","Avoid codeine-type drugs (constipating)"],
-["Fissure","Topical calcium-channel blocker","Nifedipine ointment (compounded; some brands combine nifedipine + lidocaine); diltiazem 2% gel","Three times a day; healing over 60–90%"],
-["Fissure","Topical nitrate","Anobliss (glyceryl trinitrate 0.2%), Rectogesic","Twice daily; headache is common"],
-["Fissure","Botulinum toxin A","Botox, Nabota","Up to 20 units, injected into internal sphincter each side"],
-["Fissure","Topical anesthetic","Lignocaine jelly/ointment (Xylocaine, Lox)","Before defecation"],
-["Fistula / post-op","Antiseptic and analgesia","Sitz bath (warm water, or povidone-iodine: Betadine); metronidazole (Flagyl) if prescribed","After each bowel motion"],
-["Abscess","Antibiotics (only if high risk)","Amoxicillin-clavulanate (Augmentin, Clavam) or ciprofloxacin + metronidazole","Immunocompromised, prosthetic valve or joint, diabetes, IBD; drainage is the main treatment"]];
-var mq="";
+var MEDICINE_REVIEW_DATE="31 October 2026";
+var MEDICINE_GROUPS=[
+  {
+    "name": "Bulk-forming fibre",
+    "condition": "Hemorrhoids / Fissure",
+    "note": "Take with adequate water; avoid in suspected bowel obstruction. These are fibre products, not stimulant laxatives.",
+    "rows": [
+      {
+        "brand": "Fybogel Orange",
+        "composition": "Ispaghula husk (see label for amount per serving)",
+        "company": "Reckitt Benckiser India Ltd — marketer",
+        "pack": "100 g",
+        "price": 220,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.zepto.com/cn/pharma-wellness/ayurvedic-extract/cid/9d67e028-f9f1-405b-b980-b30593250afd/scid/373ade33-c2b4-45cf-ab38-2d85440f9338"
+      },
+      {
+        "brand": "Naturolax-A Orange",
+        "composition": "Psyllium husk (see label)",
+        "company": "Piramal Enterprises Ltd — marketer",
+        "pack": "300 g",
+        "price": 486,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.apollopharmacy.in/otc/sat-isabgol-powder-200gm"
+      },
+      {
+        "brand": "Dabur Sat Isabgol",
+        "composition": "Psyllium husk",
+        "company": "Dabur India Ltd — marketer",
+        "pack": "180 g",
+        "price": 345,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.zepto.com/cn/pharma-wellness/ayurvedic-extract/cid/9d67e028-f9f1-405b-b980-b30593250afd/scid/373ade33-c2b4-45cf-ab38-2d85440f9338"
+      },
+      {
+        "brand": "Baidyanath Isabgol",
+        "composition": "Psyllium husk",
+        "company": "Baidyanath — brand owner; verify manufacturing entity on pack",
+        "pack": "100 g",
+        "price": 195,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.zepto.com/cn/pharma-wellness/ayurvedic-extract/cid/9d67e028-f9f1-405b-b980-b30593250afd/scid/373ade33-c2b4-45cf-ab38-2d85440f9338"
+      },
+      {
+        "brand": "Patanjali Isabgol",
+        "composition": "Psyllium husk",
+        "company": "Patanjali — brand owner; verify manufacturing entity on pack",
+        "pack": "100 g",
+        "price": 159,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.zepto.com/cn/pharma-wellness/ayurvedic-extract/cid/9d67e028-f9f1-405b-b980-b30593250afd/scid/373ade33-c2b4-45cf-ab38-2d85440f9338"
+      }
+    ]
+  },
+  {
+    "name": "Stool softeners / laxatives (including combinations)",
+    "condition": "Hemorrhoids / Fissure",
+    "note": "Titrate to soft stool. Lactulose and paraffin/magnesium products are different therapies. Use magnesium cautiously in renal impairment; stimulant combinations generally short term.",
+    "rows": [
+      {
+        "brand": "Duphalac Lemon",
+        "composition": "Lactulose 3.335 g/5 mL",
+        "company": "Abbott India Ltd — marketer",
+        "pack": "150 mL",
+        "price": 198.14,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/duphalac-oral-solution-lemon-422744"
+      },
+      {
+        "brand": "Looz",
+        "composition": "Lactulose 10 g/15 mL",
+        "company": "Intas Pharmaceuticals Ltd — marketer",
+        "pack": "500 mL",
+        "price": 661.5,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.apollopharmacy.in/shop-by-category/laxatives-purgatives"
+      },
+      {
+        "brand": "Cremaffin Mixed Fruit",
+        "composition": "Liquid paraffin + milk of magnesia (strength per pack label)",
+        "company": "Abbott India Ltd — manufacturer/marketer",
+        "pack": "225 mL",
+        "price": 318.59,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.zepto.com/cn/gut-care/constipation/cid/1493a215-3a11-4e5d-9206-6e762ed0387b/scid/7339df91-21c0-42de-8114-0a5e3d32ce36"
+      },
+      {
+        "brand": "Cremaffin Plus",
+        "composition": "Sodium picosulfate 3.33 mg + liquid paraffin 1.25 mL + milk of magnesia 3.75 mL per 5 mL",
+        "company": "Abbott — marketer",
+        "pack": "225 mL",
+        "price": 371.5,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.apollopharmacy.in/shop-by-category/laxatives-purgatives"
+      },
+      {
+        "brand": "Laxikem Plus",
+        "composition": "Liquid paraffin 1.25 mL + milk of magnesia 3.75 mL + sodium picosulfate 3.33 mg per 5 mL",
+        "company": "Alkem Laboratories Ltd — marketer",
+        "pack": "170 mL",
+        "price": 144.35,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://jantapharmacy.co.in/ingredients/sodium-picosulfate"
+      }
+    ]
+  },
+  {
+    "name": "Venotonic flavonoid combinations",
+    "condition": "Hemorrhoids",
+    "note": "Adjunct for symptoms; not a substitute for assessment of bleeding. Same salts do not establish identical micronization or bioavailability.",
+    "rows": [
+      {
+        "brand": "Daflon 500",
+        "composition": "Diosmin 450 mg + hesperidin 50 mg",
+        "company": "Servier India Private Limited — marketer",
+        "pack": "10 tablets",
+        "price": 207.6,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.1mg.com/brands/daflon-ZGFmbG9u"
+      },
+      {
+        "brand": "Aldosmin 500",
+        "composition": "Diosmin 450 mg + hesperidin 50 mg",
+        "company": "Sun Pharmaceutical Industries Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 168.5,
+        "priceType": "Listed price",
+        "combination": true,
+        "source": "https://www.apollopharmacy.in/medicine-substitute/daflon-500mg-tab"
+      },
+      {
+        "brand": "Venoflav-500",
+        "composition": "Diosmin 450 mg + hesperidin 50 mg",
+        "company": "Theia Health Care Pvt Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 165,
+        "priceType": "Listed price",
+        "combination": true,
+        "source": "https://www.apollopharmacy.in/medicine-substitute/daflon-500mg-tab"
+      },
+      {
+        "brand": "Dafnova-500",
+        "composition": "Diosmin 450 mg + hesperidin 50 mg",
+        "company": "Johnlee Pharmaceuticals Pvt Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 151,
+        "priceType": "Listed price; out of stock at source",
+        "combination": true,
+        "source": "https://www.apollopharmacy.in/medicine-substitute/daflon-500mg-tab"
+      },
+      {
+        "brand": "Dezivein-500",
+        "composition": "Diosmin 450 mg + hesperidin 50 mg",
+        "company": "Leche Healthcare Pvt Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 133.5,
+        "priceType": "Listed price; out of stock at source",
+        "combination": true,
+        "source": "https://www.apollopharmacy.in/medicine-substitute/daflon-500mg-tab"
+      }
+    ]
+  },
+  {
+    "name": "Calcium dobesilate",
+    "condition": "Hemorrhoids",
+    "note": "Adjunct only; review indication and label. Unit prices below are per capsule, not strip prices.",
+    "rows": [
+      {
+        "brand": "Dobesil 500",
+        "composition": "Calcium dobesilate 500 mg",
+        "company": "Sun Pharmaceutical Industries Ltd — marketer",
+        "pack": "1 capsule (unit price)",
+        "price": 23.2,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/Dobesil-Capsule-115020"
+      },
+      {
+        "brand": "Dobimec 500",
+        "composition": "Calcium dobesilate 500 mg",
+        "company": "Leeford Healthcare Ltd — marketer",
+        "pack": "1 capsule (unit price)",
+        "price": 8.56,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/Dobesil-Capsule-115020"
+      },
+      {
+        "brand": "Caldob",
+        "composition": "Calcium dobesilate 500 mg",
+        "company": "Comed Chemicals Ltd — marketer",
+        "pack": "1 capsule (unit price)",
+        "price": 18.07,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/Dobesil-Capsule-115020"
+      },
+      {
+        "brand": "Dobimust 500",
+        "composition": "Calcium dobesilate 500 mg",
+        "company": "Mankind Pharma Ltd — marketer",
+        "pack": "1 capsule (unit price)",
+        "price": 24.7,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/Dobesil-Capsule-115020"
+      },
+      {
+        "brand": "Dobest",
+        "composition": "Calcium dobesilate 500 mg",
+        "company": "Wallace Pharmaceuticals Pvt Ltd — marketer",
+        "pack": "1 capsule (unit price)",
+        "price": 25.1,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/Dobesil-Capsule-115020"
+      }
+    ]
+  },
+  {
+    "name": "Topical anesthetic / steroid combinations",
+    "condition": "Hemorrhoids",
+    "note": "Short course only, usually no more than about 7 days without reassessment. Compositions differ; not interchangeable. Steroids can cause local atrophy.",
+    "rows": [
+      {
+        "brand": "Proctosedyl BD",
+        "composition": "Beclometasone 0.025% + phenylephrine 0.1% + lidocaine 2.5% w/w",
+        "company": "Emcure Pharmaceuticals Ltd — marketer",
+        "pack": "20 g",
+        "price": 129.98,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/proctosedyl-bd-rectal-cream-152631"
+      },
+      {
+        "brand": "Anovate",
+        "composition": "Beclometasone 0.025% + phenylephrine 0.1% + lidocaine 2.5% w/w",
+        "company": "USV Private Limited — marketer",
+        "pack": "20 g",
+        "price": 152.55,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/anovate-cream-63345"
+      },
+      {
+        "brand": "Smuth cream",
+        "composition": "Lidocaine 3% + calcium dobesilate 0.25% + hydrocortisone 0.25% + zinc oxide 5% w/w",
+        "company": "Aristo Pharmaceuticals Pvt Ltd — manufacturer/marketer",
+        "pack": "30 g",
+        "price": 170.5,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/smuth-cream-113915"
+      },
+      {
+        "brand": "Ruticool",
+        "composition": "Lidocaine 3% + hydrocortisone 0.25% + phenylephrine 0.1% + zinc oxide 5% + calcium dobesilate 0.25% w/w",
+        "company": "Lupin Ltd — marketer",
+        "pack": "30 g",
+        "price": 216.5,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/ruticool-cream-152360?addToCart=true"
+      },
+      {
+        "brand": "Pilo GO",
+        "composition": "Beclometasone 0.025% + phenylephrine 0.1% + lidocaine 2.5% w/w",
+        "company": "Leeford Healthcare Ltd — marketer",
+        "pack": "20 g",
+        "price": 92.81,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/proctosedyl-bd-rectal-cream-152631"
+      }
+    ]
+  },
+  {
+    "name": "Ayurvedic / polyherbal adjuncts",
+    "condition": "Hemorrhoids",
+    "note": "Different formulations with limited comparative clinical evidence; no claim of equivalence to standard treatment. Full ingredients, quantities and manufacturing entity must be checked on the actual pack.",
+    "rows": [
+      {
+        "brand": "Pilex tablets",
+        "composition": "Polyherbal formulation; see current pack label",
+        "company": "Himalaya Wellness Company — manufacturer",
+        "pack": "60 tablets",
+        "price": 245,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://himalayawellness.in/collections/tablets-capsules/products/pilex-tablets"
+      },
+      {
+        "brand": "Pilex Forte tablets",
+        "composition": "Polyherbal formulation; see current pack label",
+        "company": "Himalaya Wellness Company — manufacturer",
+        "pack": "30 tablets",
+        "price": 154,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://pharmeasy.in/health-care/piles-relief-438"
+      },
+      {
+        "brand": "Pilex Forte ointment",
+        "composition": "Sensitive plant + zinc calx; full formula per label",
+        "company": "Himalaya Wellness Company — manufacturer",
+        "pack": "30 g",
+        "price": 150,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://himalayawellness.in/products/pilex-forte-ointment"
+      },
+      {
+        "brand": "Divya Arshkalp Vati",
+        "composition": "Polyherbal formulation; see current pack label",
+        "company": "Patanjali / Divya Pharmacy — verify entity on pack",
+        "pack": "80 tablets",
+        "price": 95,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.1mg.com/categories/health-conditions/piles-fissures-fistula-43?filter=true&pageNumber=11"
+      },
+      {
+        "brand": "Baidyanath (Jhansi) Arshoghani Bati",
+        "composition": "Polyherbal formulation; see current pack label",
+        "company": "Baidyanath (Jhansi) — verify manufacturing entity on pack",
+        "pack": "40 tablets",
+        "price": 235,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.1mg.com/categories/health-conditions/piles-fissures-fistula-43?filter=true&pageNumber=11"
+      }
+    ]
+  },
+  {
+    "name": "Paracetamol analgesics",
+    "condition": "Hemorrhoids / Fissure / Post-op",
+    "note": "Avoid duplicate paracetamol in combination products; adjust for liver disease, alcohol use and patient factors. Avoid constipating opioids where possible.",
+    "rows": [
+      {
+        "brand": "Calpol 500 +",
+        "composition": "Paracetamol 500 mg; brand suffix does not mean a second ingredient",
+        "company": "GlaxoSmithKline Pharmaceuticals Ltd — manufacturer/marketer",
+        "pack": "15 tablets",
+        "price": 14.26,
+        "priceType": "Manufacturer price list (2025)",
+        "combination": false,
+        "source": "https://india-pharma.gsk.com/media/o2qfyufn/trade-circular-revised-mrp.pdf"
+      },
+      {
+        "brand": "Dolo 500",
+        "composition": "Paracetamol 500 mg",
+        "company": "Micro Labs Ltd — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 0.85,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/calpol-500-tablet-878516"
+      },
+      {
+        "brand": "ParaCIP 500",
+        "composition": "Paracetamol 500 mg",
+        "company": "Cipla Ltd — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 0.9,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/calpol-500-tablet-878516"
+      },
+      {
+        "brand": "P 500",
+        "composition": "Paracetamol 500 mg",
+        "company": "Apex Laboratories Pvt Ltd — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 0.97,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/calpol-500-tablet-878516"
+      },
+      {
+        "brand": "Pacimol 500",
+        "composition": "Paracetamol 500 mg",
+        "company": "Ipca Laboratories Ltd — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 0.98,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/calpol-500-tablet-878516"
+      }
+    ]
+  },
+  {
+    "name": "NSAID analgesics (including combinations)",
+    "condition": "Selected patients / Post-op",
+    "note": "Avoid with active bleeding, renal impairment, peptic ulcer or relevant anticoagulation risk. Do not combine NSAIDs. Combination products also contribute to total paracetamol intake.",
+    "rows": [
+      {
+        "brand": "Brufen 400",
+        "composition": "Ibuprofen 400 mg",
+        "company": "Abbott — marketer",
+        "pack": "20 tablets",
+        "price": 25.75,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/brufen-400-tablet-70206"
+      },
+      {
+        "brand": "Naprosyn 500 +",
+        "composition": "Naproxen sodium 550 mg (verify salt and naproxen equivalent on label)",
+        "company": "RPG Life Sciences Ltd — marketer",
+        "pack": "15 tablets",
+        "price": 162.53,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.netmeds.com/brand/netmeds?categorynamelevel2=Nonsteroidal+Anti-Inflammatory+Drugs+%28NSAIDs%29"
+      },
+      {
+        "brand": "Combiflam",
+        "composition": "Ibuprofen 400 mg + paracetamol 325 mg",
+        "company": "Sanofi Consumer Healthcare India Limited — marketer",
+        "pack": "20 tablets",
+        "price": 57.45,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://counterfoil.in/medicines/brand/combiflam/"
+      },
+      {
+        "brand": "Ibugesic Plus",
+        "composition": "Ibuprofen 400 mg + paracetamol 325 mg",
+        "company": "Cipla Ltd — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 1.87,
+        "priceType": "Listed unit price",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/flexon-tablet-64529"
+      },
+      {
+        "brand": "Fenceta 400/325",
+        "composition": "Ibuprofen 400 mg + paracetamol 325 mg",
+        "company": "Alkem Laboratories Ltd — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 2,
+        "priceType": "Listed unit price",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/flexon-tablet-64529"
+      }
+    ]
+  },
+  {
+    "name": "Topical diltiazem (including combination)",
+    "condition": "Fissure",
+    "note": "Prescription topical sphincter relaxation. Compounded and marketed products may differ; monitor headache, dizziness and local irritation.",
+    "rows": [
+      {
+        "brand": "Cremagel",
+        "composition": "Diltiazem 2% w/w",
+        "company": "Abbott — marketer",
+        "pack": "30 g",
+        "price": 288.16,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/dilgel-150685"
+      },
+      {
+        "brand": "Dilgel",
+        "composition": "Diltiazem 2% w/w",
+        "company": "Cadila Pharmaceuticals Ltd — marketer",
+        "pack": "30 g",
+        "price": 120.94,
+        "priceType": "Listed MRP; sold out at source",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/dilgel-150685"
+      },
+      {
+        "brand": "Diltigesic Organogel",
+        "composition": "Diltiazem 2% w/w",
+        "company": "Troikaa Pharmaceuticals Ltd — marketer",
+        "pack": "30 g",
+        "price": 234.37,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/diltigesic-organogel-304557"
+      },
+      {
+        "brand": "Anoheal",
+        "composition": "Diltiazem 2% w/w",
+        "company": "RR Pharmacia — marketer",
+        "pack": "30 g",
+        "price": 117.19,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.medkart.in/composition/diltiazem-2-w-w"
+      },
+      {
+        "brand": "Cremagel-L",
+        "composition": "Diltiazem 2% + lidocaine 2% w/w",
+        "company": "Abbott — marketer",
+        "pack": "30 g",
+        "price": 311.95,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.netmeds.com/brand/netmeds?categorynamelevel2=Anorectal+Preparations&departments=medicine"
+      }
+    ]
+  },
+  {
+    "name": "Topical nifedipine combinations",
+    "condition": "Fissure",
+    "note": "Anobliss is nifedipine plus lidocaine, NOT glyceryl trinitrate. Prescription use; watch local irritation and hypotension.",
+    "rows": [
+      {
+        "brand": "Anobliss",
+        "composition": "Nifedipine 0.3% + lidocaine 1.5% w/w",
+        "company": "Samarth Life Sciences Pvt Ltd — marketer",
+        "pack": "30 g",
+        "price": 168.21,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/anobliss-cream-145210"
+      },
+      {
+        "brand": "Anorelief",
+        "composition": "Nifedipine 0.3% + lidocaine 1.5% w/w",
+        "company": "Micro Labs Ltd — marketer",
+        "pack": "30 g",
+        "price": 184.6,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.1mg.com/en/drugs/anorelief-cream-154432"
+      },
+      {
+        "brand": "Fidonal",
+        "composition": "Nifedipine 0.3% + lidocaine 1.5% w/w",
+        "company": "Abbott — marketer",
+        "pack": "30 g",
+        "price": 357.31,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/fidonal-cream-514307"
+      },
+      {
+        "brand": "Nifecaine",
+        "composition": "Nifedipine 0.3% + lidocaine 1.5% w/w",
+        "company": "Troikaa Pharmaceuticals Ltd — marketer",
+        "pack": "30 g",
+        "price": 185.62,
+        "priceType": "Listed tube price",
+        "combination": true,
+        "source": "https://www.medkart.in/hi/order-medicine/anobliss-cream-30-gm"
+      },
+      {
+        "brand": "Anasdee NF",
+        "composition": "Nifedipine 0.3% + lidocaine 1.5% w/w",
+        "company": "Leeford Healthcare Ltd — marketer",
+        "pack": "30 g",
+        "price": 125,
+        "priceType": "Listed MRP",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/anasdee-nf-cream-1114893"
+      }
+    ]
+  },
+  {
+    "name": "Topical nitrate",
+    "condition": "Fissure",
+    "note": "Only one India-listed rectal product verified; five brands could not be substantiated. Rectogesic Indian availability/price not verified. Headache/hypotension; contraindicated with PDE5 inhibitors such as sildenafil or tadalafil. Cardiac nitrate formulations are not rectal substitutes.",
+    "rows": [
+      {
+        "brand": "Nitrogesic Rectal",
+        "composition": "Glyceryl trinitrate (nitroglycerin) 0.2% w/w",
+        "company": "Troikaa Pharmaceuticals Ltd — marketer",
+        "pack": "30 g",
+        "price": 101.25,
+        "priceType": "Listed MRP; sold out at source",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/nitrogesic-rectal-ointment-156668"
+      }
+    ]
+  },
+  {
+    "name": "Botulinum toxin type A",
+    "condition": "Chronic fissure — specialist only",
+    "note": "Specialist procurement examples, not five proven fissure-equivalent products. Units are product specific and NOT interchangeable; no universal dose or conversion. Confirm local approval, indication, cold chain and current quotation; administration costs extra.",
+    "rows": [
+      {
+        "brand": "Botox",
+        "composition": "OnabotulinumtoxinA 100 units/vial",
+        "company": "Allergan India Pvt Ltd — marketer",
+        "pack": "1 vial",
+        "price": 24197,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.medkart.in/composition/botulinum-toxin-type-a-100-iu"
+      },
+      {
+        "brand": "Intabot",
+        "composition": "Botulinum toxin type A 100 units/vial",
+        "company": "Intas Pharmaceuticals Ltd — marketer",
+        "pack": "1 vial",
+        "price": 13802.81,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.medkart.in/composition/botulinum-toxin-type-a-100-iu"
+      },
+      {
+        "brand": "Nabota",
+        "composition": "Botulinum toxin type A 100 units/vial",
+        "company": "Dr Reddy’s Laboratories Ltd — marketer",
+        "pack": "1 vial",
+        "price": 22827,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.medkart.in/composition/botulinum-toxin-type-a-100-iu"
+      },
+      {
+        "brand": "Xeomin",
+        "composition": "IncobotulinumtoxinA 100 units/vial",
+        "company": "Modi Mundi Pharma Pvt Ltd — marketer",
+        "pack": "1 vial",
+        "price": 22790,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.medkart.in/composition/botulinum-toxin-type-a-100-iu"
+      },
+      {
+        "brand": "Dysport",
+        "composition": "AbobotulinumtoxinA 500 units/vial",
+        "company": "Bharat Serums & Vaccines Ltd — marketer",
+        "pack": "1 vial",
+        "price": 28970,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs-all-medicines?label=d&page=145"
+      }
+    ]
+  },
+  {
+    "name": "Topical local anesthetic",
+    "condition": "Fissure / Selected procedures",
+    "note": "Short-term symptom relief; lidocaine does not relax the sphincter or heal a chronic fissure. Avoid excess dosing on damaged mucosa.",
+    "rows": [
+      {
+        "brand": "Xylocaine 2% Jelly",
+        "composition": "Lidocaine 2%",
+        "company": "Zydus Healthcare / Zydus Cadila — marketer",
+        "pack": "30 mL",
+        "price": 36.76,
+        "priceType": "Listed pack price",
+        "combination": false,
+        "source": "https://counterfoil.in/medicines/molecule/lidocaine/"
+      },
+      {
+        "brand": "Lox 2% Jelly",
+        "composition": "Lidocaine 2%",
+        "company": "Neon Laboratories Ltd — marketer",
+        "pack": "1 tube (pack size not verified)",
+        "price": 34.58,
+        "priceType": "Listed tube price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/wocaine-gel-291406"
+      },
+      {
+        "brand": "Lidfast 2% Jelly",
+        "composition": "Lidocaine 2%",
+        "company": "Samarth Life Sciences Pvt Ltd — marketer",
+        "pack": "1 tube (pack size not verified)",
+        "price": 33.98,
+        "priceType": "Listed tube price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/wocaine-gel-291406"
+      },
+      {
+        "brand": "Anas Dee Gel",
+        "composition": "Lidocaine 2%",
+        "company": "Leeford Healthcare Ltd — marketer",
+        "pack": "1 tube (pack size not verified)",
+        "price": 33.75,
+        "priceType": "Listed tube price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/wocaine-gel-291406"
+      },
+      {
+        "brand": "Lignox 2%",
+        "composition": "Lidocaine 2%",
+        "company": "Indoco Remedies — marketer",
+        "pack": "30 g",
+        "price": 48.75,
+        "priceType": "Listed pack price",
+        "combination": false,
+        "source": "https://counterfoil.in/medicines/molecule/lidocaine/"
+      }
+    ]
+  },
+  {
+    "name": "Povidone-iodine antiseptic",
+    "condition": "Selected external wound care",
+    "note": "Plain warm-water sitz baths are sufficient for routine hygiene. These are external skin products, not automatic sitz-bath additives or intrarectal treatments. Use only on clinician advice; consider thyroid, renal and pregnancy precautions.",
+    "rows": [
+      {
+        "brand": "Cipladine Solution",
+        "composition": "Povidone-iodine 5% w/v",
+        "company": "Cipla Health Ltd — marketer",
+        "pack": "100 mL",
+        "price": 45.92,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/cipladine-5-solution-273110"
+      },
+      {
+        "brand": "Betadine 5%",
+        "composition": "Povidone-iodine 5% w/v",
+        "company": "Win-Medicare Pvt Ltd — marketer",
+        "pack": "500 mL",
+        "price": 236.25,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/cipladine-5-solution-273110"
+      },
+      {
+        "brand": "Wokadine 5%",
+        "composition": "Povidone-iodine 5% w/v",
+        "company": "Dr Reddy’s Laboratories Ltd — marketer",
+        "pack": "500 mL",
+        "price": 233.49,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/wokadine-5-solution-981416"
+      },
+      {
+        "brand": "Pionew 5%",
+        "composition": "Povidone-iodine 5% w/v",
+        "company": "Emcure Pharmaceuticals Ltd — marketer",
+        "pack": "500 mL",
+        "price": 204.75,
+        "priceType": "Listed MRP; sold out at source",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/pionew-5-solution-717366"
+      },
+      {
+        "brand": "Vodadine 5%",
+        "composition": "Povidone-iodine 5% w/v",
+        "company": "Voda Chemicals Private Limited — marketer",
+        "pack": "500 mL",
+        "price": 192.19,
+        "priceType": "Listed MRP; sold out at source",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/vodadine-5-solution-879096"
+      }
+    ]
+  },
+  {
+    "name": "Amoxicillin–clavulanate combinations",
+    "condition": "Selected abscess patients",
+    "note": "Drainage is primary treatment. Antibiotics are selective for cellulitis, systemic illness or immunosuppression; clinician selection and renal/allergy review required. Not routine for uncomplicated drained abscess.",
+    "rows": [
+      {
+        "brand": "Augmentin 625 Duo",
+        "composition": "Amoxicillin 500 mg + clavulanic acid 125 mg",
+        "company": "GlaxoSmithKline Pharmaceuticals Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 196.5,
+        "priceType": "Listed pack price",
+        "combination": true,
+        "source": "https://www.apollopharmacy.in/medicine-substitute/novamox-cv-625mg-tablet"
+      },
+      {
+        "brand": "Clavam 625",
+        "composition": "Amoxicillin 500 mg + clavulanic acid 125 mg",
+        "company": "Alkem Laboratories Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 196.5,
+        "priceType": "Listed pack price",
+        "combination": true,
+        "source": "https://www.apollopharmacy.in/medicine-substitute/novamox-cv-625mg-tablet"
+      },
+      {
+        "brand": "Moxikind-CV 625",
+        "composition": "Amoxicillin 500 mg + clavulanic acid 125 mg",
+        "company": "Mankind Pharma Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 184,
+        "priceType": "Listed pack price",
+        "combination": true,
+        "source": "https://www.apollopharmacy.in/medicine-substitute/novamox-cv-625mg-tablet"
+      },
+      {
+        "brand": "Moxclav 625",
+        "composition": "Amoxicillin 500 mg + clavulanic acid 125 mg",
+        "company": "Sun Pharmaceutical Industries Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 195,
+        "priceType": "Listed pack price",
+        "combination": true,
+        "source": "https://www.apollopharmacy.in/medicine-substitute/moxikind-cv-625mg-tablet"
+      },
+      {
+        "brand": "Novaclav 625",
+        "composition": "Amoxicillin 500 mg + clavulanic acid 125 mg",
+        "company": "Cipla Ltd — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 10.8,
+        "priceType": "Listed unit price",
+        "combination": true,
+        "source": "https://www.1mg.com/drugs/Moxikind-CV-Tablet-329310"
+      }
+    ]
+  },
+  {
+    "name": "Ciprofloxacin",
+    "condition": "Selected abscess regimens",
+    "note": "If clinically selected, prescribe separately with appropriate anaerobic coverage such as metronidazole. Not monotherapy for mixed anorectal sepsis. Review local resistance, QT/tendon/neuropathy risks and interactions.",
+    "rows": [
+      {
+        "brand": "Ciplox 500",
+        "composition": "Ciprofloxacin 500 mg",
+        "company": "Cipla Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 45.35,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.namopharmacy.com/salt/ciprofloxacin-500mg"
+      },
+      {
+        "brand": "Ciprobid 500",
+        "composition": "Ciprofloxacin 500 mg",
+        "company": "Zydus Healthcare / Zydus Cadila — marketer",
+        "pack": "10 tablets",
+        "price": 45.36,
+        "priceType": "Listed pack price",
+        "combination": false,
+        "source": "https://counterfoil.in/medicines/molecule/ciprofloxacin/"
+      },
+      {
+        "brand": "Ciprolet DS",
+        "composition": "Ciprofloxacin 500 mg",
+        "company": "Dr Reddy’s Laboratories Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 34,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.namopharmacy.com/salt/ciprofloxacin-500mg"
+      },
+      {
+        "brand": "Quintor 500",
+        "composition": "Ciprofloxacin 500 mg",
+        "company": "Torrent Pharmaceuticals Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 34.65,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.namopharmacy.com/salt/ciprofloxacin-500mg"
+      },
+      {
+        "brand": "Ciprova-500",
+        "composition": "Ciprofloxacin 500 mg",
+        "company": "Lupin Ltd — marketer",
+        "pack": "10 tablets",
+        "price": 25,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.namopharmacy.com/salt/ciprofloxacin-500mg"
+      }
+    ]
+  },
+  {
+    "name": "Metronidazole",
+    "condition": "Selected abscess / post-op regimens",
+    "note": "Anaerobic component when indicated; not routine for uncomplicated fissure, hemorrhoids or fistula. Review warfarin interaction and label alcohol advice. No need to substitute unrelated fixed antibiotic combinations.",
+    "rows": [
+      {
+        "brand": "Metrogyl 400",
+        "composition": "Metronidazole 400 mg",
+        "company": "J B Chemicals and Pharmaceuticals Ltd — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 1.55,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/metgyl-400mg-tablet-18625"
+      },
+      {
+        "brand": "Flagyl 400",
+        "composition": "Metronidazole 400 mg",
+        "company": "Abbott — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 1.44,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/metgyl-400mg-tablet-18625"
+      },
+      {
+        "brand": "Metron 400",
+        "composition": "Metronidazole 400 mg",
+        "company": "Alkem Laboratories Ltd — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 1.15,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/metgyl-400mg-tablet-18625"
+      },
+      {
+        "brand": "Aristogyl 400",
+        "composition": "Metronidazole 400 mg",
+        "company": "Aristo Pharmaceuticals Pvt Ltd — marketer",
+        "pack": "1 tablet (unit price)",
+        "price": 1.47,
+        "priceType": "Listed unit price",
+        "combination": false,
+        "source": "https://www.1mg.com/drugs/metgyl-400mg-tablet-18625"
+      },
+      {
+        "brand": "Metgyl 400",
+        "composition": "Metronidazole 400 mg",
+        "company": "Jagsonpal Pharmaceuticals Ltd — marketer",
+        "pack": "100 tablets",
+        "price": 75,
+        "priceType": "Listed MRP",
+        "combination": false,
+        "source": "https://www.davaninja.com/search/product/metrogyl-400-tablet-537304"
+      }
+    ]
+  }
+];
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function med(){
-var s='<div class=card><h2>Medicines and brand names</h2><input type=search id=q placeholder="Search drug, brand or condition…" oninput="mf(this.value)"><div class=tw id=tb></div><p class=sm>Brands are examples commonly marketed in India; availability and compositions vary, so verify against current labels, contraindications and local formulary before prescribing. Doses are indicative only.</p></div>';
-return s}
-function mf(v){v=(v||"").toLowerCase();var r=M.filter(function(x){return x.join(" ").toLowerCase().indexOf(v)>-1});
-document.getElementById("tb").innerHTML='<table><tr><th>For</th><th>Class</th><th>Brands</th><th>Notes</th></tr>'+r.map(function(x){return '<tr><td>'+x.join('</td><td>')+'</td></tr>'}).join('')+'</table>'}
+return '<div class=card><h2>Indian medicine directory</h2><p>Five product examples per class where substantiated, including fixed-dose combinations. Brand listings are examples, not a sales ranking or prescribing recommendation.</p><p class=sm>Sources checked '+MEDICINE_REVIEW_DATE+'. Prices are static reference prices in INR, not live quotes. MRP, selling price and unit price are labelled separately; verify the current pack. Listing does not confirm local stock. Company details identify manufacturer or marketer as reported; batch manufacturer may differ.</p><label for=q>Search medicines</label><input type=search id=q placeholder="Drug, brand, manufacturer, condition or class…" oninput="mf()"><label for=mc>Drug class</label><select id=mc onchange="mf()"><option value="">All classes</option>'+MEDICINE_GROUPS.map(function(g,i){return '<option value="'+i+'">'+esc(g.name)+'</option>'}).join('')+'</select><label for=mt>Formulation</label><select id=mt onchange="mf()"><option value="">All formulations</option><option value="combo">Combinations only</option><option value="single">Single-ingredient products</option></select><button class="btn s" onclick="resetMedicines()">Clear filters</button><p id=medcount class=sm role=status aria-live=polite></p></div><div id=tb></div><div class=card><h2>Clinical context and source limits</h2><p>Abscess drainage is the main treatment. Antibiotics are selective for cellulitis, systemic infection or immunosuppression; they do not replace drainage. Ciprofloxacin plus metronidazole refers to separately selected medicines, not an instruction to use an arbitrary fixed combination.</p><p><a href="https://www.ascrsu.com/ascrs/view/ASCRS-Evidence-Based-Guidelines-and-Expert-Consensus/3982014/0/Management_of_Anorectal_Abscess__Fistula_in_Ano__and_Rectovaginal_Fistula__2022_" target=_blank rel="noopener noreferrer">ASCRS abscess guidance</a></p><p class=sm>Where a product source only identifies the marketer, the manufacturing site is not inferred. Unverified pack sizes are explicitly marked. Ayurvedic formulations are distinct products with limited comparative evidence; the formulation filter does not classify their full ingredient lists. Specialist botulinum-toxin products have non-interchangeable units; prices exclude administration.</p></div>'}
+function resetMedicines(){document.getElementById("q").value="";document.getElementById("mc").value="";document.getElementById("mt").value="";mf()}
+function mf(){
+var v=document.getElementById("q").value.trim().toLowerCase(),c=document.getElementById("mc").value,t=document.getElementById("mt").value,n=0;
+var cards=MEDICINE_GROUPS.map(function(g,i){
+if(c!==""&&String(i)!==c)return "";
+var rows=g.rows.filter(function(r){var herbal=g.name.indexOf("Ayurvedic")===0;return (!t||(t==="combo"?r.combination:!r.combination&&!herbal))&&[g.name,g.condition,r.brand,r.composition,r.company,r.pack].join(" ").toLowerCase().includes(v)});
+if(!rows.length)return "";
+n+=rows.length;
+return '<section class=card><h2>'+esc(g.name)+'</h2><p class=sm>'+esc(g.condition)+' · '+rows.length+' of '+g.rows.length+' entries</p><p>'+esc(g.note)+'</p><div class=tw tabindex=0 role=region aria-label="'+esc(g.name)+' medicine table"><table><thead><tr><th scope=col>Brand / formulation</th><th scope=col>Composition / strength</th><th scope=col>Manufacturer / marketer</th><th scope=col>Pack / price unit</th><th scope=col>Reference cost (₹)</th><th scope=col>Source</th></tr></thead><tbody>'+rows.map(function(r){return '<tr><td><b>'+esc(r.brand)+'</b>'+(r.combination?'<br><span class=sm>Combination</span>':'')+'</td><td>'+esc(r.composition)+'</td><td>'+esc(r.company)+'</td><td>'+esc(r.pack)+'</td><td>₹'+Number(r.price).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})+'<br><span class=sm>'+esc(r.priceType)+'</span></td><td><a href="'+esc(r.source)+'" target=_blank rel="noopener noreferrer">View listing</a></td></tr>'}).join('')+'</tbody></table></div></section>'
+}).join("");
+document.getElementById("medcount").textContent=n+" product entries shown • checked "+MEDICINE_REVIEW_DATE;
+document.getElementById("tb").innerHTML=cards||'<div class=card><p>No medicines match these filters.</p></div>';
+}
 function learn(){
 function c(t,b){return '<div class=card><h2>'+t+'</h2>'+b+'</div>'}
 return c("Hemorrhoids",'<ul><li>Present with bleeding and protrusion; pain is less common than with fissure. Severe pain suggests thrombosis.</li><li>Bleeding: painless bright red blood in the toilet or on wiping.</li><li>Diagnosis is by physical examination, digital examination and anoscopy.</li></ul>')+
@@ -120,6 +1048,6 @@ c("Fistula in ano",'<ul><li>Communication between an abscess cavity and an inter
 c("Anal fissure",'<ul><li>Most common cause of rectal bleeding in infancy. Mostly posterior (or anterior) midline; related to constipation, diarrhea, trauma, Crohn’s.</li><li>Raised internal sphincter pressure causes relative ischemia and poor healing.</li><li>Chronic: present over 6 weeks; sentinel pile, hypertrophied papilla, visible sphincter fibers.</li><li>Conservative care heals 60–90%: fiber, softeners, topical anesthetics, sitz baths. Nifedipine ointment TDS or botulinum toxin heals over 80%. Surgery: lateral internal sphincterotomy (incontinence risk, more in women).</li></ul>')}
 function show(){
 var h=document.getElementById("nav");h.innerHTML=tabs.map(function(t,i){return '<button class="'+(i==cur?'on':'')+'" onclick="cur='+i+';show()">'+t+'</button>'}).join('');
-document.getElementById("m").innerHTML=[assess,hx,med,learn][cur]();if(cur==2)mf("");window.scrollTo(0,0)}
+document.getElementById("m").innerHTML=[assess,hx,med,learn][cur]();if(cur==2)mf();window.scrollTo(0,0)}
 show();
 </script></body></html>
